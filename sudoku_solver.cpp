@@ -77,6 +77,7 @@ boardp solve(board tester)
 
 board solve_sudoku(board origboard)
 {
+
     board gameboard = origboard;
     boardp finalboard = 0;
 
@@ -110,8 +111,9 @@ board solve_sudoku(board origboard)
         if (solved)
             break;
     }
-
-    board ret = *finalboard;
+    board ret{};
+    if (finalboard)
+        ret = *finalboard;
     delete finalboard;
     return ret;
 }
