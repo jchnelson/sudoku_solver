@@ -1,33 +1,69 @@
-#include <iostream>
+#include <QApplication>
+#include <QMainWindow>
+#include <QGridLayout>
+#include <QLineEdit>
+#include <QLabel>
+#include <QPushButton>
+#include <QString>
+#include <QDebug>
+
 #include "sudoku_solver.h"
 
-using std::cout;
+#include <array>
 
+using fieldarray = std::array<std::array<QLineEdit*, 9>, 9>;
 
-int main()
+void make_board(fieldarray fields)
 {
-    board origboard{
-        boardrow{1,0,0,0,0,0,0,0,0},
-        boardrow{0,7,0,4,1,0,2,8,0},
-        boardrow{9,0,8,2,0,0,4,0,0},
-        boardrow{0,0,1,0,0,0,0,0,0},
-        boardrow{0,0,0,0,0,0,0,9,1},
-        boardrow{0,6,0,0,0,5,3,0,0},
-        boardrow{3,0,0,0,8,9,0,7,2},
-        boardrow{0,0,5,0,0,2,0,0,0},
-        boardrow{0,0,0,0,4,0,0,5,0},
-            };
-
-    board finalboard = solve_sudoku(origboard);
-
-    for (size_t i = 0; i != 9; ++i)
+    board origboard;
+    for (int i = 0; i != 9; ++i)
     {
-        for (size_t j = 0; j != 9; ++j)
+        for (int j = 0; j != 9; ++j)
         {
-            cout << (finalboard)[i][j];
+            origboard[i][j] = fields[i][j]->text().toInt();
         }
-        cout << '\n';
     }
-    cout << "\n\n";
+    
+    board finalboard = solve_sudoku(origboard);
+    
+    for (int i = 0; i != 9; ++i)
+    {
+        for (int j = 0; j != 9; ++j)
+        {
+            fields[i][j]->setText(QString::number(finalboard[i][j]));
+        }
+    }
+}
 
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    QMainWindow w;
+    QWidget* bigboss = new QWidget(&w);
+    w.setCentralWidget(bigboss);
+    QGridLayout* glayout = new QGridLayout();
+    bigboss->setLayout(glayout);
+    
+    board origboard{};
+    fieldarray fields; 
+    
+    for (int i = 0; i != 9; ++i)
+    {
+        for (int j = 0; j != 9; ++j)
+        {
+            auto bob = new QLineEdit(QString::number(origboard[i][j]));
+            fields[i][j] = bob;
+            bob->setMaximumWidth(20);
+            glayout->addWidget(bob, i, j);
+        }
+    }
+    QPushButton* solve_button = new QPushButton("Solve Sudoku");
+    glayout->addWidget(solve_button, 9, 2, 1, 5);
+    
+    QObject::connect(solve_button, &QPushButton::clicked, [=] () {
+        make_board(fields);
+    });
+    
+    w.show();
+    return a.exec();
 }
