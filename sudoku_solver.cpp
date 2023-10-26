@@ -7,27 +7,24 @@ static bool solved = false;
 
 bool valid(board& b, size_t row, size_t col, int guess)
 {
-    bool ret = true;
     for (int i = 0; i != 9; ++i)
     {
         if (b[row][i] == guess)
         {
             if (i != col)
-                ret = false;
+                return false;
         }
         if (b[i][col] == guess)
         {
             if (i != row)
-                ret = false;
+                return false;
         }
         for (int j = 0; j != 9; ++j)
             if ((i != row || j != col) && i / 3 == row / 3 && j / 3 == col / 3)
                 if (b[i][j] == guess)
-                    ret = false;
-        if (!ret)
-            break;
+                    return false;
     }
-    return ret;
+    return true;
 }
 
 boardp solve(board tester)
